@@ -4,20 +4,15 @@ const instructions = document.getElementById("instruction");
 const closeButton = document.getElementById("close-button");
 const gameError = document.getElementById("error");
 const startButton = document.getElementById("start");
+const gameTime = document.getElementById("game-time");
+const gameScore = document.getElementById("game-score");
+const gameHighscore = document.getElementById("game-highscore");
 let onGame = false;
 let mousePosition = { x: -10, y: -10 };
 let quadrant = -1;
 let score = 0;
 let holePosition = -1;
-closeButton.addEventListener("click", () => {
-  scoreboard.style.opacity = 0;
-  score = 0;
-  setTimeout(() => {
-    scoreboard.style.display = "none";
-    score = 0;
-    onGame = false;
-  }, 1000);
-});
+
 startButton.addEventListener("click", () => {
   startGame();
   console.log("game started");
@@ -301,7 +296,6 @@ function drawMoleandHole(random) {
       drawSixthMoleandHole();
       break;
   }
-  return random;
 }
 function resetBoard() {
   ctx.fillStyle = "rgba(0,0,0,255)";
@@ -315,12 +309,33 @@ function resetBoard() {
   drawHole((width / 3 / 2) * 3, (height / 2 / 2) * 3 + 50, 100, 50, colorHole);
   drawHole((width / 3 / 2) * 5, (height / 2 / 2) * 3 + 50, 100, 50, colorHole);
 }
+function setCookie(name, value, daysToExpire) {
+  const expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() + daysToExpire);
+
+  const cookie = `${name}=${value}; expires=${expirationDate.toUTCString()}; path=/`;
+  document.cookie = cookie;
+}
+function getCookie(name) {
+  const cookies = document.cookie.split("; ");
+  for (const cookie of cookies) {
+    const [cookieName, cookieValue] = cookie.split("=");
+    if (cookieName === name) {
+      return cookieValue;
+    }
+  }
+  return null;
+}
 const randomNum = (quadrantExcluded) => {
   let random = Math.floor(Math.random() * 6);
-  while (random === quadrantExcluded) {
-    random = Math.floor(Math.random() * 6);
+  if (random === quadrantExcluded) {
+    randomNum(quadrantExcluded);
+  } else {
+    return random;
   }
 };
+let highscore = getCookie("highscore");
+document.getElementById("game-highscore").innerHTML = highscore;
 const eachQuadrant = (x, y) => {
   if (x >= 0 && x <= width / 3 && y >= 0 && y <= height / 2) {
     return 0;
@@ -353,47 +368,72 @@ const eachQuadrant = (x, y) => {
 };
 
 const eachScore = 10;
+canvas.addEventListener("click", (e) => {
+  const x = e.offsetX;
+  const y = e.offsetY;
+  mousePosition = { x, y };
+  quadrant = eachQuadrant(x, y);
+});
+closeButton.addEventListener("click", () => {
+  scoreboard.style.opacity = 0;
+  score = 0;
+  holePosition = -1;
+  gameScore.innerHTML = score;
+  setTimeout(() => {
+    scoreboard.style.display = "none";
+    score = 0;
+    onGame = false;
+  }, 1000);
+});
 const startGame = () => {
   const timer = Number(document.getElementById("timer").value) * 10;
   const speed = Number(document.getElementById("speed").value);
-
-  canvas.addEventListener("click", (e) => {
-    const x = e.offsetX;
-    const y = e.offsetY;
-    mousePosition = { x, y };
-    quadrant = eachQuadrant(x, y);
-  });
-  const check = (x, y) => {};
+  onGame = false;
   if (timer >= 0 && timer <= 60 && onGame === false) {
     onGame = true;
     resetBoard();
     for (let i = 1; i <= timer; i++) {
-      setTimeout(() => {
-        holePosition = randomNum(holePosition);
-        resetBoard();
-        holePosition = drawMoleandHole(holePosition);
-        console.log("Loop", i);
+      if (onGame) {
         setTimeout(() => {
-          if (quadrant === holePosition) {
-            console.log("Scored");
-            score += eachScore;
-          } else {
-            console.log("Hole Position", holePosition);
-            console.log("Mouse Position", quadrant);
-          }
-          if (i === timer) {
-            resetBoard();
-          }
+          gameTime.innerHTML = timer - i;
         }, 1000);
-      }, 2000 * i * speed);
+        setTimeout(() => {
+          holePosition = randomNum(holePosition);
+          console.log("Hole Position", holePosition);
+          resetBoard();
+          drawMoleandHole(holePosition);
+          console.log("Loop", i);
+          setTimeout(() => {
+            if (quadrant === holePosition) {
+              score += eachScore;
+              gameScore.innerHTML = score;
+            } else {
+              score -= 1;
+              gameScore.innerHTML = score;
+            }
+            if (i === timer) {
+              resetBoard();
+            }
+          }, 1000 * speed);
+        }, 2000 * i * speed);
 
-      setTimeout(() => {
-        resetBoard();
-        onGame = false;
-        console.log("Score", score);
-        scoreboard.style.display = "block";
-        scoreElement.innerHTML = score;
-      }, 2000 * timer * speed + 1500);
+        setTimeout(() => {
+          resetBoard();
+          onGame = false;
+          console.log("Score", score);
+          scoreboard.style.display = "block";
+          scoreElement.innerHTML = score;
+          highscore = Number(getCookie("highscore"));
+
+          if (highscore === null) {
+            setCookie("highscore", score, 365);
+            gameHighscore.innerHTML = score;
+          } else if (score > highscore) {
+            gameHighscore.innerHTML = score;
+            setCookie("highscore", score, 365);
+          }
+        }, 2000 * timer * speed + 2000);
+      }
     }
   }
 };
