@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whack A Mole</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="score-container" id="scoreboard">
+      <div class="scoreboard">
+        <div class="close-button" id="close-button">
+          <svg
+            width="50px"
+            height="50px"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g id="Edit / Close_Circle">
+              <path
+                id="Vector"
+                d="M9 9L11.9999 11.9999M11.9999 11.9999L14.9999 14.9999M11.9999 11.9999L9 14.9999M11.9999 11.9999L14.9999 9M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z"
+                stroke="#e2e2e2"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </g>
+          </svg>
+        </div>
+        <div class="wrapper">
+          <div class="score">
+            <h1 class="current-score"><span id="score">0</span></h1>
+            <p>YOUR SCORE</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="game-container">
+      <div>
+        <section class="card" id="instruction">
+          <div class="card-content">
+            <h1>Retro Whack-a-Mole!</h1>
+
+            <ul>
+              <li>Controls</li>
+              <ul>
+                <li>Use your mouse to hover over the mole that appears.</li>
+                <li>Click on the mole to whack it.</li>
+              </ul>
+            </ul>
+            <div class="settings">
+              <h1>Game Settings</h1>
+              <div>
+                <label for="timer">Set Game Timer</label>
+                <select name="timer" id="timer">
+                  <option value="1">10 Seconds</option>
+                  <option value="2">20 Seconds</option>
+                  <option value="3">30 Seconds</option>
+                </select>
+              </div>
+              <div>
+                <label for="speed"> Set Game Speed </label>
+                <select name="speed" id="speed">
+                  <option value="0.8">Easy</option>
+                  <option value="0.6">Medium</option>
+                  <option value="0.4">Hard</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn" id="start">Start Game</button>
+            <p id="error"></p>
+            <div class="game-details">
+              <p>Game Time: <span id="game-time">0</span></p>
+              <p>Score: <span id="game-score">0</span></p>
+              <p>High Score: <span id="game-highscore">0</span></p>
+            </div>
+          </div>
+        </section>
+        <div class="game">
+          <canvas id="canvas" width="900px" height="600px"></canvas>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
