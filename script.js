@@ -243,36 +243,60 @@ function drawMole(x, y) {
   );
   floodFill(x + 79, y + 96, "black", [196, 118, 56, 255]);
 }
-function animateMole(x, y) {}
+function animateMole(x, y) {
+  let backwards = false;
+  for (let i = 0; ; ) {
+    if (i > 3) {
+      backwards = true;
+    }
+    if (i < 0 && backwards) {
+      break;
+    }
+    if (backwards) {
+      i--;
+    } else {
+      i++;
+    }
+    setTimeout(() => {
+      resetBoard();
+      drawHole(x, y, 100, 50, color);
+      drawMole(x - 40, y - 140 + i * 2);
+    }, 10 * i * 0.5);
+  }
+}
 
 function drawFirstMoleandHole() {
-  drawHole(width / 3 / 2, height / 2 / 2 + 50, 100, 50, colorHole);
-  drawMole(width / 3 / 2 - 40, height / 2 / 2 + 50 - 140);
+  animateMole(width / 3 / 2, height / 2 / 2 + 50);
 }
 
 function drawSecondMoleandHole() {
   drawHole((width / 3 / 2) * 3, height / 2 / 2 + 50, 100, 50, colorHole);
   drawMole((width / 3 / 2) * 3 - 40, height / 2 / 2 + 50 - 140);
+  animateMole((width / 3 / 2) * 3, height / 2 / 2 + 50);
 }
 
 function drawThirdMoleandHole() {
   drawHole((width / 3 / 2) * 5, height / 2 / 2 + 50, 100, 50, colorHole);
   drawMole((width / 3 / 2) * 5 - 40, height / 2 / 2 + 50 - 140);
+  animateMole((width / 3 / 2) * 5, height / 2 / 2 + 50);
 }
 
 function drawFourthMoleandHole() {
   drawHole(width / 3 / 2, (height / 2 / 2) * 3 + 50, 100, 50, colorHole);
   drawMole(width / 3 / 2 - 40, (height / 2 / 2) * 3 + 50 - 140);
+  animateMole(width / 3 / 2, (height / 2 / 2) * 3 + 50);
 }
 
 function drawFifthMoleandHole() {
   drawHole((width / 3 / 2) * 3, (height / 2 / 2) * 3 + 50, 100, 50, colorHole);
   drawMole((width / 3 / 2) * 3 - 40, (height / 2 / 2) * 3 + 50 - 140);
+  animateMole((width / 3 / 2) * 3, (height / 2 / 2) * 3 + 50);
 }
 
 function drawSixthMoleandHole() {
   drawHole((width / 3 / 2) * 5, (height / 2 / 2) * 3 + 50, 100, 50, colorHole);
   drawMole((width / 3 / 2) * 5 - 40, (height / 2 / 2) * 3 + 50 - 140);
+  animateMole((width / 3 / 2) * 5, (height / 2 / 2) * 3 + 50);
 }
 
 function drawMoleandHole(random) {
@@ -297,10 +321,12 @@ function drawMoleandHole(random) {
       break;
   }
 }
+let color = "green";
 function resetBoard() {
   ctx.fillStyle = "rgba(0,0,0,255)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  draw2x3Grid("white");
+  draw2x3Grid(color);
+
   colorHole = "gray";
   drawHole(width / 3 / 2, height / 2 / 2 + 50, 100, 50, colorHole);
   drawHole((width / 3 / 2) * 3, height / 2 / 2 + 50, 100, 50, colorHole);
@@ -383,6 +409,7 @@ closeButton.addEventListener("click", () => {
     scoreboard.style.display = "none";
     score = 0;
     onGame = false;
+    location.reload();
   }, 1000);
 });
 const startGame = () => {
@@ -396,7 +423,7 @@ const startGame = () => {
       if (onGame) {
         setTimeout(() => {
           gameTime.innerHTML = timer - i;
-        }, 1000);
+        }, 2000 * i * speed);
         setTimeout(() => {
           holePosition = randomNum(holePosition);
           console.log("Hole Position", holePosition);
@@ -404,17 +431,23 @@ const startGame = () => {
           drawMoleandHole(holePosition);
           console.log("Loop", i);
           setTimeout(() => {
+            if (color === "green") {
+              color = "yellow";
+            } else if (color === "yellow") {
+              color = "red";
+            } else if (color === "red") {
+              color = "green";
+            }
             if (quadrant === holePosition) {
               score += eachScore;
               gameScore.innerHTML = score;
             } else {
-              score -= 1;
               gameScore.innerHTML = score;
             }
             if (i === timer) {
               resetBoard();
             }
-          }, 1000 * speed);
+          }, 1000);
         }, 2000 * i * speed);
 
         setTimeout(() => {
